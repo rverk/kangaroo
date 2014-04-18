@@ -73,7 +73,7 @@ public class KafkaRecordReader extends RecordReader<LongWritable, BytesWritable>
         this.pos = inputSplit.getStartOffset();
         this.currentOffset = inputSplit.getStartOffset();
         this.end = inputSplit.getEndOffset();
-        this.fetchSize = KafkaInputFormat.getFetchSize(conf);
+        this.fetchSize = KafkaInputFormat.getKafkaFetchSizeBytes(conf);
         this.consumer = getConsumer(inputSplit, conf);
     }
 
@@ -198,7 +198,7 @@ public class KafkaRecordReader extends RecordReader<LongWritable, BytesWritable>
     @VisibleForTesting
     SimpleConsumer getConsumer(final KafkaInputSplit split, final Configuration conf) {
         return new SimpleConsumer(split.getPartition().getBroker().getHost(), split.getPartition().getBroker()
-                .getPort(), getSocketTimeout(conf), getBufferSize(conf));
+                .getPort(), getKafkaSocketTimeoutMs(conf), getKafkaBufferSizeBytes(conf));
     }
 
     @VisibleForTesting

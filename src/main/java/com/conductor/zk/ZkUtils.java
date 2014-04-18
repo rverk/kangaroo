@@ -73,14 +73,14 @@ public class ZkUtils implements Closeable {
      *            config with the Zookeeper settings in it.
      * @see KafkaInputFormat#getZkConnect(org.apache.hadoop.conf.Configuration)
      * @see KafkaInputFormat#getZkRoot(org.apache.hadoop.conf.Configuration)
-     * @see KafkaInputFormat#getZkSessionTimeout(org.apache.hadoop.conf.Configuration)
-     * @see KafkaInputFormat#getZkConnectionTimeout(org.apache.hadoop.conf.Configuration)
+     * @see KafkaInputFormat#getZkSessionTimeoutMs(org.apache.hadoop.conf.Configuration)
+     * @see KafkaInputFormat#getZkConnectionTimeoutMs(org.apache.hadoop.conf.Configuration)
      */
     public ZkUtils(final Configuration config) {
         this(KafkaInputFormat.getZkConnect(config), // zookeeper connection string
                 KafkaInputFormat.getZkRoot(config), // zookeeper root
-                KafkaInputFormat.getZkSessionTimeout(config), // session timeout
-                KafkaInputFormat.getZkConnectionTimeout(config)); // connection timeout
+                KafkaInputFormat.getZkSessionTimeoutMs(config), // session timeout
+                KafkaInputFormat.getZkConnectionTimeoutMs(config)); // connection timeout
     }
 
     /**

@@ -80,7 +80,7 @@ public final class KafkaJobBuilder {
     private String zkConnect;
     private String taskMemorySettings;
     private int numReduceTasks = 10;
-    private int kafkaFetchSize = 5 * 1024 * 1024;
+    private int kafkaFetchSizeBytes = 5 * 1024 * 1024;
     private boolean useS3 = false;
     private String s3Bucket;
     private String s3AccessKey;
@@ -163,7 +163,7 @@ public final class KafkaJobBuilder {
 
         // setup kafka input format specifics
         KafkaInputFormat.setZkConnect(job, getZkConnect());
-        KafkaInputFormat.setFetchSize(job, getKafkaFetchSize());
+        KafkaInputFormat.setKafkaFetchSizeBytes(job, getKafkaFetchSizeBytes());
 
         job.setSpeculativeExecution(false);
         job.setJarByClass(getClass());
@@ -331,15 +331,15 @@ public final class KafkaJobBuilder {
     }
 
     /**
-     * Sets the Kafka fetch size (optional, defaults to {@link KafkaInputFormat#DEFAULT_FETCH_SIZE}).
+     * Sets the Kafka fetch size in bytes (optional, defaults to {@link KafkaInputFormat#DEFAULT_FETCH_SIZE_BYTES}).
      * 
-     * @param kafkaFetchSize
+     * @param kafkaFetchSizeBytes
      *            fetch size in bytes.
      * @return {@code this}
-     * @see KafkaInputFormat#setFetchSize(Job, int)
+     * @see KafkaInputFormat#setKafkaFetchSizeBytes(Job, int)
      */
-    public KafkaJobBuilder setKafkaFetchSize(final int kafkaFetchSize) {
-        this.kafkaFetchSize = kafkaFetchSize;
+    public KafkaJobBuilder setKafkaFetchSizeBytes(final int kafkaFetchSizeBytes) {
+        this.kafkaFetchSizeBytes = kafkaFetchSizeBytes;
         return this;
     }
 
@@ -516,8 +516,8 @@ public final class KafkaJobBuilder {
         return numReduceTasks;
     }
 
-    public int getKafkaFetchSize() {
-        return kafkaFetchSize;
+    public int getKafkaFetchSizeBytes() {
+        return kafkaFetchSizeBytes;
     }
 
     public Class<? extends OutputFormat> getOutputFormatClass() {

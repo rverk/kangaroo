@@ -92,7 +92,7 @@ public class KafkaJobBuilderTest {
         builder.setTaskMemorySettings("-Xmx2048m");
         builder.setNumReduceTasks(100);
         builder.setParitioner(MockPartitioner.class);
-        builder.setKafkaFetchSize(1024);
+        builder.setKafkaFetchSizeBytes(1024);
 
         Job job = builder.configureJob(conf);
 
@@ -104,7 +104,7 @@ public class KafkaJobBuilderTest {
         assertEquals("-Xmx2048m", job.getConfiguration().get("mapred.child.java.opts"));
         assertEquals(100, job.getNumReduceTasks());
         assertEquals(MockPartitioner.class, job.getPartitionerClass());
-        assertEquals(1024, KafkaInputFormat.getFetchSize(job.getConfiguration()));
+        assertEquals(1024, KafkaInputFormat.getKafkaFetchSizeBytes(job.getConfiguration()));
         assertEquals(TextOutputFormat.class, job.getOutputFormatClass());
         assertEquals(KafkaInputFormat.class, job.getInputFormatClass());
         assertEquals("file:/a/hdfs/path", TextOutputFormat.getOutputPath(job).toString());

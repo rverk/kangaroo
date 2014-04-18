@@ -53,9 +53,9 @@ public class KafkaRecordReaderTest {
         when(job.getConfiguration()).thenReturn(conf);
 
         KafkaInputFormat.setConsumerGroup(job, "group");
-        KafkaInputFormat.setSocketTimeout(job, 1000);
-        KafkaInputFormat.setBufferSize(job, 4096);
-        KafkaInputFormat.setFetchSize(job, 2048);
+        KafkaInputFormat.setKafkaSocketTimeoutMs(job, 1000);
+        KafkaInputFormat.setKafkaBufferSizeBytes(job, 4096);
+        KafkaInputFormat.setKafkaFetchSizeBytes(job, 2048);
 
         final Broker broker = new Broker("localhost", 9092, 1);
         this.partition = new Partition("topic", 0, broker);

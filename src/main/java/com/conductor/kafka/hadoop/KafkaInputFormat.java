@@ -51,23 +51,23 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
     /**
      * Default Kafka fetch size, 1MB.
      */
-    public static final int DEFAULT_FETCH_SIZE = 1024 * 1024; // 1MB
+    public static final int DEFAULT_FETCH_SIZE_BYTES = 1024 * 1024; // 1MB
     /**
      * Default Kafka socket timeout, 10 seconds.
      */
-    public static final int DEFAULT_SOCKET_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
+    public static final int DEFAULT_SOCKET_TIMEOUT_MS = (int) TimeUnit.SECONDS.toMillis(10);
     /**
      * Default Kafka buffer size, 64KB.
      */
-    public static final int DEFAULT_BUFFER_SIZE = 64 * 1024; // 64 KB
+    public static final int DEFAULT_BUFFER_SIZE_BYTES = 64 * 1024; // 64 KB
     /**
      * Default Zookeeper session timeout, 10 seconds.
      */
-    public static final int DEFAULT_ZK_SESSION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
+    public static final int DEFAULT_ZK_SESSION_TIMEOUT_MS = (int) TimeUnit.SECONDS.toMillis(10);
     /**
      * Default Zookeeper connection timeout, 10 seconds.
      */
-    public static final int DEFAULT_ZK_CONNECTION_TIMEOUT = (int) TimeUnit.SECONDS.toMillis(10);
+    public static final int DEFAULT_ZK_CONNECTION_TIMEOUT_MS = (int) TimeUnit.SECONDS.toMillis(10);
     /**
      * Default Zookeeper root, '/'.
      */
@@ -166,7 +166,8 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
 
     @VisibleForTesting
     SimpleConsumer getConsumer(final Broker broker) {
-        return new SimpleConsumer(broker.getHost(), broker.getPort(), DEFAULT_SOCKET_TIMEOUT, DEFAULT_BUFFER_SIZE);
+        return new SimpleConsumer(broker.getHost(), broker.getPort(), DEFAULT_SOCKET_TIMEOUT_MS,
+                DEFAULT_BUFFER_SIZE_BYTES);
     }
 
     @VisibleForTesting
@@ -205,20 +206,20 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * @param sessionTimeout
      *            the session timeout in milliseconds.
      */
-    public static void setZkSessionTimeout(final Job job, final int sessionTimeout) {
+    public static void setZkSessionTimeoutMs(final Job job, final int sessionTimeout) {
         job.getConfiguration().setInt("kafka.zk.session.timeout.ms", sessionTimeout);
     }
 
     /**
-     * Gets the Zookeeper session timeout set by {@link #setZkSessionTimeout(Job, int)}, defaulting to
-     * {@link #DEFAULT_ZK_SESSION_TIMEOUT} if it has not been set.
+     * Gets the Zookeeper session timeout set by {@link #setZkSessionTimeoutMs(Job, int)}, defaulting to
+     * {@link #DEFAULT_ZK_SESSION_TIMEOUT_MS} if it has not been set.
      * 
      * @param conf
      *            the job conf.
      * @return the Zookeeper session timeout.
      */
-    public static int getZkSessionTimeout(final Configuration conf) {
-        return conf.getInt("kafka.zk.session.timeout.ms", DEFAULT_ZK_SESSION_TIMEOUT);
+    public static int getZkSessionTimeoutMs(final Configuration conf) {
+        return conf.getInt("kafka.zk.session.timeout.ms", DEFAULT_ZK_SESSION_TIMEOUT_MS);
     }
 
     /**
@@ -229,20 +230,20 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * @param connectionTimeout
      *            the connection timeout in milliseconds.
      */
-    public static void setZkConnectionTimeout(final Job job, final int connectionTimeout) {
+    public static void setZkConnectionTimeoutMs(final Job job, final int connectionTimeout) {
         job.getConfiguration().setInt("kafka.zk.connection.timeout.ms", connectionTimeout);
     }
 
     /**
-     * Gets the Zookeeper connection timeout set by {@link #setZkConnectionTimeout(Job, int)}, defaulting to
-     * {@link #DEFAULT_ZK_CONNECTION_TIMEOUT} if it has not been set.
+     * Gets the Zookeeper connection timeout set by {@link #setZkConnectionTimeoutMs(Job, int)}, defaulting to
+     * {@link #DEFAULT_ZK_CONNECTION_TIMEOUT_MS} if it has not been set.
      * 
      * @param conf
      *            the job conf.
      * @return the Zookeeper connection timeout.
      */
-    public static int getZkConnectionTimeout(final Configuration conf) {
-        return conf.getInt("kafka.zk.connection.timeout.ms", DEFAULT_ZK_CONNECTION_TIMEOUT);
+    public static int getZkConnectionTimeoutMs(final Configuration conf) {
+        return conf.getInt("kafka.zk.connection.timeout.ms", DEFAULT_ZK_CONNECTION_TIMEOUT_MS);
     }
 
     /**
@@ -324,20 +325,20 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * @param fetchSize
      *            the fetch size (bytes).
      */
-    public static void setFetchSize(final Job job, final int fetchSize) {
+    public static void setKafkaFetchSizeBytes(final Job job, final int fetchSize) {
         job.getConfiguration().setInt("kafka.fetch.size", fetchSize);
     }
 
     /**
-     * Gets the Kafka fetch size set by {@link #setFetchSize(Job, int)}, defaulting to {@link #DEFAULT_FETCH_SIZE} if it
-     * has not been set.
+     * Gets the Kafka fetch size set by {@link #setKafkaFetchSizeBytes(Job, int)}, defaulting to
+     * {@link #DEFAULT_FETCH_SIZE_BYTES} if it has not been set.
      * 
      * @param conf
      *            the job conf.
      * @return the Kafka fetch size.
      */
-    public static int getFetchSize(final Configuration conf) {
-        return conf.getInt("kafka.fetch.size", DEFAULT_FETCH_SIZE);
+    public static int getKafkaFetchSizeBytes(final Configuration conf) {
+        return conf.getInt("kafka.fetch.size", DEFAULT_FETCH_SIZE_BYTES);
     }
 
     /**
@@ -348,20 +349,20 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * @param bufferSize
      *            the buffer size (bytes).
      */
-    public static void setBufferSize(final Job job, final int bufferSize) {
+    public static void setKafkaBufferSizeBytes(final Job job, final int bufferSize) {
         job.getConfiguration().setInt("kafka.socket.buffersize", bufferSize);
     }
 
     /**
-     * Gets the Kafka buffer size set by {@link #setBufferSize(Job, int)}, defaulting to {@link #DEFAULT_BUFFER_SIZE} if
-     * it has not been set.
+     * Gets the Kafka buffer size set by {@link #setKafkaBufferSizeBytes(Job, int)}, defaulting to
+     * {@link #DEFAULT_BUFFER_SIZE_BYTES} if it has not been set.
      * 
      * @param conf
      *            the job conf.
      * @return the Kafka buffer size.
      */
-    public static int getBufferSize(final Configuration conf) {
-        return conf.getInt("kafka.socket.buffersize", DEFAULT_BUFFER_SIZE);
+    public static int getKafkaBufferSizeBytes(final Configuration conf) {
+        return conf.getInt("kafka.socket.buffersize", DEFAULT_BUFFER_SIZE_BYTES);
     }
 
     /**
@@ -372,19 +373,19 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * @param timeout
      *            the socket timeout (milliseconds).
      */
-    public static void setSocketTimeout(final Job job, final int timeout) {
+    public static void setKafkaSocketTimeoutMs(final Job job, final int timeout) {
         job.getConfiguration().setInt("kafka.socket.timeout.ms", timeout);
     }
 
     /**
-     * Gets the Kafka socket timeout set by {@link #setSocketTimeout(Job, int)}, defaulting to
-     * {@link #DEFAULT_SOCKET_TIMEOUT} if it has not been set.
+     * Gets the Kafka socket timeout set by {@link #setKafkaSocketTimeoutMs(Job, int)}, defaulting to
+     * {@link #DEFAULT_SOCKET_TIMEOUT_MS} if it has not been set.
      * 
      * @param conf
      *            the job conf.
      * @return the Kafka socket timeout.
      */
-    public static int getSocketTimeout(final Configuration conf) {
-        return conf.getInt("kafka.socket.timeout.ms", DEFAULT_SOCKET_TIMEOUT);
+    public static int getKafkaSocketTimeoutMs(final Configuration conf) {
+        return conf.getInt("kafka.socket.timeout.ms", DEFAULT_SOCKET_TIMEOUT_MS);
     }
 }
