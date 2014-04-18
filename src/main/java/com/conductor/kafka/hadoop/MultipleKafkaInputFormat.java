@@ -55,7 +55,7 @@ public class MultipleKafkaInputFormat extends InputFormat<LongWritable, BytesWri
         final List<InputSplit> splits = Lists.newArrayList();
         final List<TopicConf> topicConfs = getTopics(conf);
         warnOnDuplicateTopicConsumers(topicConfs);
-        for (TopicConf topicConf : topicConfs) {
+        for (final TopicConf topicConf : topicConfs) {
             final String topic = topicConf.getTopic();
             final String group = topicConf.getConsumerGroup();
             final Class<? extends Mapper> delegateMapper = topicConf.getMapper();
@@ -110,7 +110,7 @@ public class MultipleKafkaInputFormat extends InputFormat<LongWritable, BytesWri
     @SuppressWarnings("unchecked")
     public static List<TopicConf> getTopics(final Configuration conf) {
         final List<TopicConf> result = Lists.newArrayList();
-        for (String topicConf : conf.get(TOPICS_CONF).split(";")) {
+        for (final String topicConf : conf.get(TOPICS_CONF).split(";")) {
             final String[] topicConfTokens = topicConf.split(",");
             final String topic = topicConfTokens[0];
             final String group = topicConfTokens[1];
