@@ -28,13 +28,12 @@ import com.google.common.collect.Ranges;
  * as well as consumer group offset operations and queries.
  * 
  * <p/>
- * Thank you, <a href="https://github.com/miniway">Dongmin Yu</a> for the inspiration of this class.
+ * Thanks to <a href="https://github.com/miniway">Dongmin Yu</a> for providing the inspiration for this code.
  * 
  * <p/>
  * The original source code can be found <a target="_blank" href="https://github.com/miniway/kafka-hadoop-consumer">on
  * Github</a>.
  * 
- * @author <a href="mailto:miniway@gmail.com">Dongmin Yu</a>
  * @author <a href="mailto:cgreen@conductor.com">Casey Green</a>
  */
 public class ZkUtils implements Closeable {

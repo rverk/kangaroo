@@ -28,7 +28,7 @@ import com.google.common.annotations.VisibleForTesting;
  * {@link com.conductor.kafka.Partition}.
  * 
  * <p/>
- * Thank you <a href="https://github.com/miniway">Dongmin Yu</a> for the inspiration of this class.
+ * Thanks to <a href="https://github.com/miniway">Dongmin Yu</a> for providing the inspiration for this code.
  * 
  * <p/>
  * The original source code can be found <a target="_blank" href="https://github.com/miniway/kafka-hadoop-consumer">on
