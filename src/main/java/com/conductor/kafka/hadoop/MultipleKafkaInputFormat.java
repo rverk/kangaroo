@@ -29,8 +29,7 @@ import com.google.common.collect.Sets;
  * be sure not to override it!
  * 
  * <p/>
- * You can combine this {@link InputFormat} with {@link org.apache.hadoop.mapreduce.lib.input.MultipleInputs} if you
- * wish.
+ * This class may be used safely in combination with {@link org.apache.hadoop.mapreduce.lib.input.MultipleInputs}.
  * 
  * @see KafkaInputFormat
  * @see KafkaInputSplit
