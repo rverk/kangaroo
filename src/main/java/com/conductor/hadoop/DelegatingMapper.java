@@ -19,8 +19,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.util.ReflectionUtils;
 
 /**
- * An {@link Mapper} that delegates behavior of {@link org.apache.hadoop.mapreduce.InputSplit}s to multiple other
- * mappers.
+ * A {@link Mapper} implementation that delegates behavior of {@link org.apache.hadoop.mapreduce.InputSplit}s to
+ * multiple other mappers.
  * 
  * <p/>
  * This class is taken directly from the Hadoop source code so that we can leverage {@link TaggedInputSplit} which is
