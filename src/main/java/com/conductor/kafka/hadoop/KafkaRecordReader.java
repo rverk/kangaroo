@@ -179,10 +179,12 @@ public class KafkaRecordReader extends RecordReader<LongWritable, BytesWritable>
         ZkUtils zk = null;
         try {
             zk = getZk();
-            // note: last parameter (temp) MUST be true. It is up to the ToolRunner to commit offsets upon successful
-            // job execution. Reason: since there are multiple input splits per partition, the consumer group could get
-            // into a bad state if this split finished successfully and committed the offset while another input split
-            // from the same partition didn't finish successfully.
+            /**
+             * Note: last parameter (temp) MUST be true. It is up to the ToolRunner to commit offsets upon successful
+             * job execution. Reason: since there are multiple input splits per partition, the consumer group could get
+             * into a bad state if this split finished successfully and committed the offset while another input split
+             * from the same partition didn't finish successfully.
+             */
             zk.setLastCommit(getConsumerGroup(conf), split.getPartition(), currentOffset, true);
         } finally {
             IOUtils.closeQuietly(zk);
