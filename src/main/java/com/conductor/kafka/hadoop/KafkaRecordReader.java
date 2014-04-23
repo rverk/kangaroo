@@ -20,7 +20,7 @@ import org.apache.hadoop.mapreduce.*;
 
 import scala.collection.Iterator;
 
-import com.conductor.zk.ZkUtils;
+import com.conductor.kafka.zk.ZkUtils;
 import com.google.common.annotations.VisibleForTesting;
 
 /**

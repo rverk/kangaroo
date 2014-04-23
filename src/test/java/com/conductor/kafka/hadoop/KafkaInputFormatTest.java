@@ -18,7 +18,7 @@ import org.junit.Test;
 
 import com.conductor.kafka.Broker;
 import com.conductor.kafka.Partition;
-import com.conductor.zk.ZkUtils;
+import com.conductor.kafka.zk.ZkUtils;
 import com.google.common.collect.Lists;
 
 /**

@@ -1,4 +1,4 @@
-package com.conductor.zk;
+package com.conductor.kafka.zk;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -14,7 +14,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.conductor.kafka.Broker;
 import com.conductor.kafka.Partition;
-import com.conductor.zk.ZkUtils.StringSerializer;
+import com.conductor.kafka.zk.ZkUtils.StringSerializer;
 import com.google.common.collect.Lists;
 
 /**

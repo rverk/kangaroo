@@ -1,4 +1,4 @@
-package com.conductor.zk;
+package com.conductor.kafka.zk;
 
 import static java.lang.String.format;
 

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.conductor.kafka.Broker;
 import com.conductor.kafka.Partition;
-import com.conductor.zk.ZkUtils;
+import com.conductor.kafka.zk.ZkUtils;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
