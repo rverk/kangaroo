@@ -26,6 +26,9 @@ public static class MyMapper extends Mapper<LongWritable, BytesWritable, KEY_OUT
 // Create a new job
 final Job job = Job.getInstance(getConf(), "my_job");
 
+// Set the InputFormat
+job.setInputFormatClass(KafkaInputFormat.class);
+
 // Set your Zookeeper connection string
 KafkaInputFormat.setZkConnect(job, "zookeeper-1.xyz.com:2181");
 
@@ -38,7 +41,7 @@ KafkaInputFormat.setConsumerGroup(job, "my_consumer_group");
 // Set the mapper that will consume the data
 job.setMapperClass(MyMapper.class);
 
-// Only commit offsets if the job is successful
+// (Optional) Only commit offsets if the job is successful
 if (job.waitForCompletion(true)) {
     final ZkUtils zk = new ZkUtils(job.getConfiguration());
     zk.commit("my_consumer_group", "my_topic");
@@ -51,6 +54,9 @@ if (job.waitForCompletion(true)) {
 // Create a new job
 final Job job = Job.getInstance(getConf(), "my_job");
 
+// Set the InputFormat
+job.setInputFormatClass(MultipleKafkaInputFormat.class);
+
 // Set your Zookeeper connection string
 KafkaInputFormat.setZkConnect(job, "zookeeper-1.xyz.com:2181");
 
@@ -59,7 +65,7 @@ MultipleKafkaInputFormat.addTopic(job, "my_first_topic", "my_consumer_group", My
 MultipleKafkaInputFormat.addTopic(job, "my_second_topic", "my_consumer_group", MyMapper.class);
 // ...
 
-// Only commit offsets if the job is successful
+// (Optional) Only commit offsets if the job is successful
 if (job.waitForCompletion(true)) {
     final ZkUtils zk = new ZkUtils(job.getConfiguration());
     // commit the offsets for each topic
