@@ -24,7 +24,6 @@ import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.exception.ZkMarshallingError;
 import org.I0Itec.zkclient.exception.ZkNoNodeException;
 import org.I0Itec.zkclient.serialize.ZkSerializer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,7 @@ import com.conductor.kafka.Partition;
 import com.conductor.kafka.hadoop.KafkaInputFormat;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ranges;
 
@@ -60,7 +60,7 @@ public class ZkUtils implements Closeable {
     @VisibleForTesting
     ZkUtils(final ZkClient client, final String zkRoot) {
         this.client = client;
-        this.zkRoot = StringUtils.removeEnd(zkRoot, "/");
+        this.zkRoot = zkRoot.endsWith("/") ? zkRoot.substring(0, zkRoot.length() - 1) : zkRoot;
     }
 
     /**
@@ -116,7 +116,7 @@ public class ZkUtils implements Closeable {
      */
     public Broker getBroker(final Integer id) {
         String data = client.readData(getBrokerIdPath(id), true);
-        if (StringUtils.isNotBlank(data)) {
+        if (!Strings.isNullOrEmpty(data)) {
             LOG.info("Broker " + id + " " + data);
             // broker_ip_address-latest_offset:broker_ip_address:broker_port
             final String[] brokerInfoTokens = data.split(":");
@@ -173,7 +173,7 @@ public class ZkUtils implements Closeable {
      */
     public boolean partitionExists(final Broker broker, final String topic, final int partId) {
         final String parts = client.readData(getTopicBrokerIdPath(topic, broker.getId()), true);
-        return StringUtils.isNotBlank(parts) && Ranges.closedOpen(0, Integer.parseInt(parts)).contains(partId);
+        return !Strings.isNullOrEmpty(parts) && Ranges.closedOpen(0, Integer.parseInt(parts)).contains(partId);
     }
 
     /**

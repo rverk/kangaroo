@@ -16,7 +16,6 @@ package com.conductor.kafka.hadoop;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.commons.lang.StringUtils.*;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.apache.hadoop.mapreduce.lib.output.*;
 
 import com.conductor.kafka.hadoop.MultipleKafkaInputFormat.TopicConf;
 import com.google.common.annotations.Beta;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -183,7 +183,7 @@ public final class KafkaJobBuilder {
         job.setJarByClass(getClass());
 
         // memory settings for mappers
-        if (isNotBlank(getTaskMemorySettings())) {
+        if (!Strings.isNullOrEmpty(getTaskMemorySettings())) {
             job.getConfiguration().set("mapred.child.java.opts", getTaskMemorySettings());
         }
 
@@ -192,7 +192,7 @@ public final class KafkaJobBuilder {
 
     private String getDefaultedJobName() {
         final String jobName;
-        if (isBlank(getJobName())) {
+        if (Strings.isNullOrEmpty(getJobName())) {
             jobName = generateJobName();
         } else {
             jobName = getJobName();
@@ -201,7 +201,7 @@ public final class KafkaJobBuilder {
     }
 
     private Path getDefaultedOutputPath() throws Exception {
-        if (isNotBlank(getOutputFormatPath())) {
+        if (!Strings.isNullOrEmpty(getOutputFormatPath())) {
             return new Path(getOutputFormatPath());
         } else {
             if (usingS3()) {
@@ -250,8 +250,8 @@ public final class KafkaJobBuilder {
      */
     public KafkaJobBuilder addQueueInput(final String queueName, final String consumerGroup,
             final Class<? extends Mapper> mapper) {
-        checkArgument(isNotBlank(queueName), "queueName is blank or null.");
-        checkArgument(isNotBlank(consumerGroup), "consumerGroup is blank or null.");
+        checkArgument(!Strings.isNullOrEmpty(queueName), "queueName is blank or null.");
+        checkArgument(!Strings.isNullOrEmpty(consumerGroup), "consumerGroup is blank or null.");
         getQueueMappers().add(new TopicConf(queueName, consumerGroup, mapper));
         return this;
     }
@@ -472,14 +472,16 @@ public final class KafkaJobBuilder {
     }
 
     private void validateSettings() {
-        checkArgument(isNotBlank(getZkConnect()), "Did not specify a Zookeeper connection string");
+        checkArgument(!Strings.isNullOrEmpty(getZkConnect()), "Did not specify a Zookeeper connection string");
         checkArgument(!getQueueMappers().isEmpty(), "Did not specify input queue+mapper.");
         checkArgument(getOutputFormat() != null, "Did not specify an output format.");
         // if no output dir specified, must at least specify a bucket.
-        if (usingS3() && isBlank(getOutputFormatPath())) {
-            checkArgument(isNotBlank(getS3Bucket()), "Specified s3 output, but no bucket.");
+        if (usingS3() && Strings.isNullOrEmpty(getOutputFormatPath())) {
+            checkArgument(!Strings.isNullOrEmpty(getS3Bucket()), "Specified s3 output, but no bucket.");
         }
-        if (startsWithAny(getOutputFormatPath(), new String[] { "s3://", "s3n://" }) && !usingS3()) {
+        if (getOutputFormatPath() != null
+                && (getOutputFormatPath().startsWith("s3://") || getOutputFormatPath().startsWith("s3n://"))
+                && !usingS3()) {
             checkArgument(false, "Specified s3 output, but no credentials.");
         }
     }

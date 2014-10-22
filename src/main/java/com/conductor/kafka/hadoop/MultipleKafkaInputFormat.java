@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.conductor.hadoop.*;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -161,7 +161,7 @@ public class MultipleKafkaInputFormat extends InputFormat<LongWritable, BytesWri
         job.setMapperClass(DelegatingMapper.class);
         final String existingTopicConf = job.getConfiguration().get(TOPICS_CONF);
         final String topicConfig = format("%s,%s,%s", topic, consumerGroup, mapperClass.getName());
-        if (StringUtils.isBlank(existingTopicConf)) {
+        if (Strings.isNullOrEmpty(existingTopicConf)) {
             job.getConfiguration().set(TOPICS_CONF, topicConfig);
         } else {
             job.getConfiguration().set(TOPICS_CONF, format("%s;%s", existingTopicConf, topicConfig));

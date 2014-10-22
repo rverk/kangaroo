@@ -25,12 +25,12 @@ import kafka.consumer.SimpleConsumer;
 import kafka.message.*;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.mapreduce.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import scala.collection.Iterator;
 
@@ -55,7 +55,7 @@ import com.google.common.annotations.VisibleForTesting;
  * @author <a href="mailto:cgreen@conductor.com">Casey Green</a>
  */
 public class KafkaRecordReader extends RecordReader<LongWritable, BytesWritable> {
-    private static final Log LOG = LogFactory.getLog(KafkaRecordReader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaInputFormat.class);
 
     private Configuration conf;
     private KafkaInputSplit split;
