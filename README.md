@@ -1,7 +1,9 @@
 Intro
 ============
 
-Kangaroo is Conductor's scalable Hadoop Map/Reduce `InputFormat` for Kafka.
+Kangaroo is Conductor's collection of open source Hadoop Map/Reduce utilities.
+
+At the moment, we only have a scalable `InputFormat` for Kafka, but there is more to come!
 
 # Setting up Kangaroo
 
@@ -9,16 +11,16 @@ You can build Kangaroo with:
 
 ```mvn clean package```
 
-# Using Kangaroo
+## Using the KafkaInputFormat
 
-## Create a Mapper
+### Create a Mapper
 ```java
 public static class MyMapper extends Mapper<LongWritable, BytesWritable, KEY_OUT, VALUE_OUT> {
     // implementation
 }
 ```
 
-## Single topic
+### Single topic
 
 ```java
 // Create a new job
@@ -47,7 +49,7 @@ if (job.waitForCompletion(true)) {
 }
 ```
 
-## Multiple topics
+### Multiple topics
 ```java
 // Create a new job
 final Job job = Job.getInstance(getConf(), "my_job");
@@ -72,4 +74,17 @@ if (job.waitForCompletion(true)) {
     // ...
     zk.close();
 }
+```
+
+### Customize Your Job
+Our `KafkaInputFormat` allows you to limit the number of splits consumed in a single job:
+* By consuming data created approximately on or after a timestamp.
+```java
+// Consume Kafka partition files with were last modified on or after October 13th, 2014
+KafkaInputFormat.setIncludeOffsetsAfterTimestamp(job, 1413172800000);
+```
+* By consuming a maximum number of Kafka partition files (splits), per Kafka partition.
+```java
+// Consume the oldest five unconsumed Kafka files per partition
+KafkaInputFormat.setMaxSplitsPerPartition(job, 5);
 ```
