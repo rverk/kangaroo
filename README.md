@@ -4,14 +4,12 @@ Intro
 Kangaroo is Conductor's scalable Hadoop Map/Reduce `InputFormat` for Kafka.
 
 # Setting up Kangaroo
-============
 
 You can build Kangaroo with:
 
 ```mvn clean package```
 
 # Using Kangaroo
-============
 
 ## Create a Mapper
 ```java
