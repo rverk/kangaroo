@@ -9,7 +9,6 @@ import kafka.api.OffsetRequest;
 import kafka.consumer.SimpleConsumer;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -72,6 +71,14 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      * Default Zookeeper root, '/'.
      */
     public static final String DEFAULT_ZK_ROOT = "/";
+    /**
+     * Default maximum number of partitions per split.
+     */
+    public static final int DEFAULT_MAX_SPLITS_PER_PARTITION = Integer.MAX_VALUE;
+    /**
+     * Default timestamp to include
+     */
+    public static final long DEFAULT_INCLUDE_OFFSETS_AFTER_TIMESTAMP = 0;
 
     @Override
     public RecordReader<LongWritable, BytesWritable> createRecordReader(final InputSplit inputSplit,
@@ -116,7 +123,8 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
 
                 // grab all valid offsets
                 final List<Long> offsets = getOffsets(consumers.get(broker), topic, partition.getPartId(),
-                        zk.getLastCommit(group, partition));
+                        zk.getLastCommit(group, partition), getIncludeOffsetsAfterTimestamp(conf),
+                        getMaxSplitsPerPartition(conf));
                 for (int i = 0; i < offsets.size() - 1; i++) {
                     // ( offsets in descending order )
                     final long start = offsets.get(i + 1);
@@ -141,20 +149,32 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
 
     @VisibleForTesting
     List<Long> getOffsets(final SimpleConsumer consumer, final String topic, final int partitionNum,
-            final long lastCommit) {
-        final long start = consumer.getOffsetsBefore(topic, partitionNum, OffsetRequest.EarliestTime(), 1)[0];
-        final long[] offsets = ArrayUtils.add(
-                consumer.getOffsetsBefore(topic, partitionNum, OffsetRequest.LatestTime(), Integer.MAX_VALUE), start);
+            final long lastCommit, final long asOfTime, final int maxSplitsPerPartition) {
+        // all offsets that exist for this partition (in descending order)
+        final long[] allOffsets = consumer.getOffsetsBefore(topic, partitionNum, OffsetRequest.LatestTime(),
+                Integer.MAX_VALUE);
 
-        // note that the offsets are in descending order, and do not contain start
-        final List<Long> result = Lists.newArrayList();
-        for (final long offset : offsets) {
-            if (offset > lastCommit) {
+        // this gets us an offset that is strictly before 'asOfTime', or zero if none exist before that time
+        final long[] offsetsBeforeAsOf = consumer.getOffsetsBefore(topic, partitionNum, asOfTime, 1);
+        final long includeAfter = offsetsBeforeAsOf.length == 1 ? offsetsBeforeAsOf[0] : 0;
+
+        // note that the offsets are in descending order
+        List<Long> result = Lists.newArrayList();
+        for (final long offset : allOffsets) {
+            if (offset > lastCommit && offset > includeAfter) {
                 result.add(offset);
-            } else { // we can add the "lastCommit" and break out of loop since offsets are in desc order
-                result.add(lastCommit);
+            } else {
+                // we add "lastCommit" iff it is after "includeAfter"
+                if (lastCommit > includeAfter) {
+                    result.add(lastCommit);
+                }
+                // we can break out of loop here bc offsets are in desc order, and we've hit the latest one to include
                 break;
             }
+        }
+        // to get maxSplitsPerPartition number of splits, you need (maxSplitsPerPartition + 1) number of offsets.
+        if (result.size() - 1 > maxSplitsPerPartition) {
+            result = result.subList(result.size() - maxSplitsPerPartition - 1, result.size());
         }
         LOG.debug(String.format("Offsets for %s:%d:%d = %s", consumer.host(), consumer.port(), partitionNum, result));
         return result;
@@ -314,6 +334,61 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
      */
     public static String getConsumerGroup(final Configuration conf) {
         return conf.get("kafka.groupid");
+    }
+
+    /**
+     * Only consider partitions created <em>approximately</em> on or after {@code timestamp}.
+     * <p/>
+     * Note that you are only guaranteed to get all data on or after {@code timestamp}, but you may get <i>some</i> data
+     * before the specified timestamp.
+     * 
+     * @param job
+     *            the job being configured.
+     * @param timestamp
+     *            the timestamp.
+     * @see SimpleConsumer#getOffsetsBefore(String, int, long, int)
+     */
+    public static void setIncludeOffsetsAfterTimestamp(final Job job, final long timestamp) {
+        job.getConfiguration().setLong("kafka.timestamp.offset", timestamp);
+    }
+
+    /**
+     * Gets the offset timestamp set by {@link #setIncludeOffsetsAfterTimestamp(Job, long)}, returning {@code 0} by
+     * default.
+     * 
+     * @param conf
+     *            the job conf.
+     * @return the offset timestamp, {@code 0} by default.
+     */
+    public static long getIncludeOffsetsAfterTimestamp(final Configuration conf) {
+        return conf.getLong("kafka.timestamp.offset", DEFAULT_INCLUDE_OFFSETS_AFTER_TIMESTAMP);
+    }
+
+    /**
+     * Limits the number of splits to create per partition.
+     * <p/>
+     * Note that it if there more partitions to consume than {@code maxSplits}, the input format will take the
+     * <em>earliest</em> Kafka partitions.
+     * 
+     * @param job
+     *            the job to configure.
+     * @param maxSplits
+     *            the maximum number of splits to create from each Kafka partition.
+     */
+    public static void setMaxSplitsPerPartition(final Job job, final int maxSplits) {
+        job.getConfiguration().setInt("kafka.max.splits.per.partition", maxSplits);
+    }
+
+    /**
+     * Gets the maximum number of splits per partition set by {@link #setMaxSplitsPerPartition(Job, int)}, returning
+     * {@link Integer#MAX_VALUE} by default.
+     * 
+     * @param conf
+     *            the job conf
+     * @return the maximum number of splits, {@link Integer#MAX_VALUE} by default.
+     */
+    public static int getMaxSplitsPerPartition(final Configuration conf) {
+        return conf.getInt("kafka.max.splits.per.partition", DEFAULT_MAX_SPLITS_PER_PARTITION);
     }
 
     /**

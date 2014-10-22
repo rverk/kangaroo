@@ -122,6 +122,16 @@ public class KafkaJobBuilderTest {
         assertEquals(BytesWritable.class, job.getOutputValueClass());
         assertNotNull(SequenceFileOutputFormat.getOutputPath(job));
         assertNotNull(job.getJobName());
+
+        // use s3
+        builder.useS3("my_aws_key", "s3cr3t", "my-bucket");
+        builder.setTextFileOutputFormat("/a/hdfs/path");
+        job = builder.configureJob(conf);
+
+        assertEquals("my_aws_key", job.getConfiguration().get("fs.s3n.awsAccessKeyId"));
+        assertEquals("s3cr3t", job.getConfiguration().get("fs.s3n.awsSecretAccessKey"));
+        assertEquals("my_aws_key", job.getConfiguration().get("fs.s3.awsAccessKeyId"));
+        assertEquals("s3cr3t", job.getConfiguration().get("fs.s3.awsSecretAccessKey"));
     }
 
     private static class MockMapper extends Mapper {
