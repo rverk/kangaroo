@@ -50,6 +50,10 @@ public class TaggedInputSplit extends InputSplit implements Configurable, Writab
 
     private Configuration conf;
 
+    public TaggedInputSplit() {
+        // Default constructor
+    }
+
     /**
      * Creates a new TaggedInputSplit.
      * 
