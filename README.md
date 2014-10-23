@@ -3,7 +3,7 @@ Intro
 
 Kangaroo is Conductor's collection of open source Hadoop Map/Reduce utilities.
 
-At the moment, we only have a scalable `InputFormat` for Kafka, but there is more to come!
+At the moment, we only have a scalable Kafka `InputFormat`, but there is more to come!
 
 # Setting up Kangaroo
 
@@ -16,9 +16,16 @@ You can build Kangaroo with:
 ### Create a Mapper
 ```java
 public static class MyMapper extends Mapper<LongWritable, BytesWritable, KEY_OUT, VALUE_OUT> {
-    // implementation
+
+    @Override
+    protected void map(final LongWritable key, final BytesWritable value, final Context context) throws IOException, InterruptedException {
+        // implementation
+    }
 }
 ```
+
+* The `BytesWritable` value is the raw bytes of a single Kafka message.
+* The `LongWritable` key is the Kafka offset of the message.
 
 ### Single topic
 
