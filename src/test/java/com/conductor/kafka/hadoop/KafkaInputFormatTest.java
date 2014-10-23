@@ -24,7 +24,6 @@ import java.util.List;
 import kafka.api.OffsetRequest;
 import kafka.consumer.SimpleConsumer;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.Job;
@@ -155,7 +154,9 @@ public class KafkaInputFormatTest {
 
         // case 1: lastCommit of 52 -> we should only get back the first 5 offsets + the lastCommit
         final int lastCommit = 52;
-        expected = ArrayUtils.add(Arrays.copyOfRange(offsets, 0, 5), lastCommit);
+        expected = new long[6];
+        System.arraycopy(offsets, 0, expected, 0, 6);
+        expected[5] = lastCommit;
         actual = inputFormat.getOffsets(consumer, "topic", 1, lastCommit, 0, Integer.MAX_VALUE);
         compareArrayContents(expected, actual);
 
