@@ -95,3 +95,5 @@ KafkaInputFormat.setIncludeOffsetsAfterTimestamp(job, 1413172800000);
 // Consume the oldest five unconsumed Kafka files per partition
 KafkaInputFormat.setMaxSplitsPerPartition(job, 5);
 ```
+
+For more details, check out our [blog post about the KafkaInputFormat](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
