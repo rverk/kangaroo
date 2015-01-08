@@ -104,7 +104,9 @@ This calculation is pretty fast; for a topic with 30 partitions on a 10-node Kaf
 final Configuration conf = new Configuration();
 conf.set("kafka.zk.connect", "zookeeper-1.xyz.com:2181");
 
+// Get all splits for "my_topic"
 final List<InputSplit> allTopicSplits = KafkaInputFormat.getAllSplits(conf, "my_topic");
+// Get all of "my_consumer_group"'s splits for "my_topic"
 final List<InputSplit> consumerSplits = KafkaInputFormat.getSplits(conf, "my_topic", "my_consumer_group");
 
 // Do some interesting calculations...
