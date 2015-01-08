@@ -3,7 +3,7 @@ Intro
 
 Kangaroo is Conductor's collection of open source Hadoop Map/Reduce utilities.
 
-At the moment, we only have a scalable Kafka `InputFormat`, but there is more to come!
+At the moment, we only have a scalable Kafka input format, but there is more to come!
 
 # Setting up Kangaroo
 
@@ -11,8 +11,8 @@ You can build Kangaroo with:
 
 ```mvn clean package```
 
-## Using the KafkaInputFormat
-For more details, check out our [blog post about the KafkaInputFormat](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
+## Using the Kafka Input Format
+For more details, check out our [blog post about the Kafka input format](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
 
 ### Create a Mapper
 ```java
@@ -85,7 +85,7 @@ if (job.waitForCompletion(true)) {
 ```
 
 ### Customize Your Job
-Our `KafkaInputFormat` allows you to limit the number of splits consumed in a single job:
+Our Kafka input format allows you to limit the number of splits consumed in a single job:
 * By consuming data created approximately on or after a timestamp.
 ```java
 // Consume Kafka partition files with were last modified on or after October 13th, 2014
@@ -98,7 +98,7 @@ KafkaInputFormat.setMaxSplitsPerPartition(job, 5);
 ```
 
 ### Static Access to InputSplits
-Our `KafkaInputFormat` exposes static access to a hypothetical job's `KafkaInputSplits`.  We've found this information useful when estimating the number of reducers for certain jobs.
+Our Kafka input format exposes static access to a hypothetical job's `KafkaInputSplits`.  We've found this information useful when estimating the number of reducers for certain jobs.
 This calculation is pretty fast; for a topic with 30 partitions on a 10-node Kafka cluster, this calculation took about 1 second.
 ```java
 final Configuration conf = new Configuration();
