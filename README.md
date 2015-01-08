@@ -12,6 +12,7 @@ You can build Kangaroo with:
 ```mvn clean package```
 
 ## Using the KafkaInputFormat
+For more details, check out our [blog post about the KafkaInputFormat](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
 
 ### Create a Mapper
 ```java
@@ -96,4 +97,19 @@ KafkaInputFormat.setIncludeOffsetsAfterTimestamp(job, 1413172800000);
 KafkaInputFormat.setMaxSplitsPerPartition(job, 5);
 ```
 
-For more details, check out our [blog post about the KafkaInputFormat](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
+### Static Access to InputSplits
+Our `KafkaInputFormat` exposes static access to a hypothetical job's `KafkaInputSplits`.  We've found this information useful when estimating the number of reducers for certain jobs.
+This calculation is pretty fast; for a topic with 30 partitions on a 10-node Kafka cluster, this calculation took about 1 second.
+```java
+final Configuration conf = new Configuration();
+conf.set("kafka.zk.connect", "zookeeper-1.xyz.com:2181");
+
+final List<InputSplit> allTopicSplits = KafkaInputFormat.getAllSplits(conf, "my_topic");
+final List<InputSplit> consumerSplits = KafkaInputFormat.getSplits(conf, "my_topic", "my_consumer_group");
+
+// Do some interesting calculations...
+long totalInputBytesOfJob = 0;
+for (final InputSplit split : consumerSplits) {
+    totalInputBytesOfJob += split.getLength();
+}
+```

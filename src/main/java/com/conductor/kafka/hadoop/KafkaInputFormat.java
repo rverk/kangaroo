@@ -15,8 +15,7 @@
 package com.conductor.kafka.hadoop;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import kafka.api.OffsetRequest;
@@ -106,6 +105,48 @@ public class KafkaInputFormat extends InputFormat<LongWritable, BytesWritable> {
         final String topic = getTopic(conf);
         final String group = getConsumerGroup(conf);
         return getInputSplits(conf, topic, group);
+    }
+
+    /**
+     * Returns the {@code topic} splits of the consumer {@code group} that would be input to a {@link Job} configured
+     * with the provided {@code conf}
+     * <p/>
+     * This information may be useful for calculating the number of reducers your job will need.
+     * <p/>
+     * <em>Note:</em> At the very least, {@code kafka.zk.connect} must be set in {@code conf}.
+     *
+     * @param conf
+     *            the conf, containing at least the {@code kafka.zk.connect} setting.
+     * @param topic
+     *            the kafka topic of hypothetical job.
+     * @param group
+     *            the consumer group of the hypothetical job
+     * @return the number of splits the hypothetical job would get.
+     * @throws IOException
+     */
+    public static List<InputSplit> getSplits(final Configuration conf, final String topic, final String group)
+            throws IOException {
+        return new KafkaInputFormat().getInputSplits(conf, topic, group);
+    }
+
+    /**
+     * Returns all of the {@code topic} splits that would be input to a {@link Job} configured with the provided
+     * {@code conf}.
+     * <p/>
+     * This information may be useful for calculating the number of reducers your job will need.
+     * <p/>
+     * <em>Note:</em> At the very least, {@code kafka.zk.connect} must be set in {@code conf}.
+     *
+     * @param conf
+     *            the conf, containing at least the {@code kafka.zk.connect} setting.
+     * @param topic
+     *            the kafka topic of hypothetical job.
+     * @return the number of splits the hypothetical job would get.
+     * @throws IOException
+     */
+    public static List<InputSplit> getAllSplits(final Configuration conf, final String topic) throws IOException {
+        // use a random UUID as the consumer group to (basically) guarantee a non-existent consumer
+        return new KafkaInputFormat().getInputSplits(conf, topic, UUID.randomUUID().toString());
     }
 
     /**
