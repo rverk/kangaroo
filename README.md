@@ -14,6 +14,8 @@ You can build Kangaroo with:
 ## Using the Kafka Input Format
 For more details, check out our [blog post about the Kafka input format](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
 
+For a Kafka 0.8.1-compatible version of this code, see [this branch](https://github.com/Conductor/kangaroo/tree/kafka-8). (It compiles, is unit tested, but completely untested in the wild - please help us get it up to snuff!)
+
 ### Create a Mapper
 ```java
 public static class MyMapper extends Mapper<LongWritable, BytesWritable, KEY_OUT, VALUE_OUT> {
