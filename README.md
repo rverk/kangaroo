@@ -130,9 +130,12 @@ The job setup of these `FileInputFormat`s are optimized for S3. Namely, each one
 3. Trims out all of the `FileSystem` operations that are irrelevant to S3.
 
 Th overall performance boost varies based on the number of input directories (S3 prefixes in this case). With 10 or more
-input directories, you can expect 2-3x faster split discovery.  If your input splits share a common S3 prefix, you
-will get the most performance boost.  In one test of 7000 input files that shared a common prefix, our input format
-discovered splits in 10 seconds, whereas the Hadoop `FileInputFormat` took 730 seconds.
+input directories, you can expect 2-3x faster split discovery.
+
+If your input directories share a common S3 prefix, **only add the common prefix to your job**.  This will give you the
+biggest performance boost because the input format takes advantage of `AmazonS3.listObjects`.  In one test of 7000 input
+files that shared a common prefix, our input format discovered splits in 10 seconds, whereas the Hadoop
+`FileInputFormat` took 730 seconds.
 
 ## Job setup
 
