@@ -5,8 +5,8 @@ Kangaroo is Conductor's collection of open source Hadoop Map/Reduce utilities.
 
 Currently, Kangaroo includes:
 
-1. A scalable Kafka input format
-2. Several `FileInputFormat`s optimized for S3-based data.
+1. A scalable [Kafka input format](#kafka)
+2. Several [FileInputFormats optimized for S3 input data](#s3).
 
 # Setting up Kangaroo
 
@@ -14,7 +14,7 @@ You can build Kangaroo with:
 
 ```mvn clean package```
 
-## Using the Kafka Input Format
+## <a name="kafka"></a>Using the Kafka Input Format
 For more details, check out our [blog post about the Kafka input format](http://www.conductor.com/nightlight/data-stream-processing-bulk-kafka-hadoop/ "Data Stream Processing: A Scalable Bridge from Kafka to Hadoop").
 
 For a Kafka 0.8.1-compatible version of this code, see [this branch](https://github.com/Conductor/kangaroo/tree/kafka-8). (It compiles, is unit tested, but completely untested in the wild - please help us get it up to snuff!)
@@ -121,13 +121,13 @@ for (final InputSplit split : consumerSplits) {
 }
 ```
 
-## Using the S3 Input Formats
+## <a name="s3"></a>Using the S3 Input Formats
 
 The job setup of these `FileInputFormat`s are optimized for S3. Namely, each one:
 
-1. Uses the `AmazonS3` client instead of the `S3FileSystem` during job setup.
+1. Uses the `AmazonS3` client instead of the `S3FileSystem`.
 2. Uses `AmazonS3.listObjects` to efficiently discover input files recursively.
-3. Trims out all of the `FileSystem` operations that are irrelevant to S3 during job setup.
+3. Trims out all of the `FileSystem` operations that are irrelevant to S3.
 
 Th overall performance boost varies based on the number of input directories (S3 prefixes in this case). With 10 or more
 input directories, you can expect 2-3x faster split discovery.  If your input splits share a common S3 prefix, you
