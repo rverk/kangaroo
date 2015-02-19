@@ -3,7 +3,10 @@ Intro
 
 Kangaroo is Conductor's collection of open source Hadoop Map/Reduce utilities.
 
-At the moment, we only have a scalable Kafka input format, but there is more to come!
+Currently, Kangaroo includes:
+
+1. A scalable Kafka input format
+2. Several `FileInputFormat`s optimized for S3-based data.
 
 # Setting up Kangaroo
 
@@ -120,4 +123,48 @@ for (final InputSplit split : consumerSplits) {
 
 ## Using the S3 Input Formats
 
-Coming soon...
+The job setup of these `FileInputFormat`s are optimized for S3. Namely, each one:
+
+1. Uses the `AmazonS3` client instead of the `S3FileSystem` during job setup.
+2. Uses `AmazonS3.listObjects` to efficiently discover input files recursively.
+3. Trims out all of the `FileSystem` operations that are irrelevant to S3 during job setup.
+
+Th overall performance boost varies based on the number of input directories (S3 prefixes in this case). With 10 or more
+input directories, you can expect 2-3x faster split discovery.  If your input splits share a common S3 prefix, you
+will get the most performance boost.  In one test of 7000 input files that shared a common prefix, our input format
+discovered splits in 10 seconds, whereas the Hadoop `FileInputFormat` took 730 seconds.
+
+## Job setup
+
+You use these input formats *exactly* the way you normally use `SequenceFileInputFormat` or `TextFileInputFormat`,
+except you specify our S3 input format on the job settings:
+
+```java
+// put your AWS credentials in the Configuration
+final Configuration conf = new Configuration();
+conf.set("fs.s3n.awsAccessKeyId", "YOUR_AWS_KEY");
+conf.set("fs.s3n.awsSecretAccessKey", "YOUR_AWS_SECRET");
+
+// create a job
+final Job job = Job.getInstance(getConf(), "my_job");
+
+// This is the only difference! All other settings are exactly the same.
+job.setInputFormatClass(S3SequenceFileInputFormat.class);
+
+// add your input paths - if your input paths share a common prefix, just add the parent prefix!!
+SequenceFileInputFormat.addInputPath(job, new Path("s3n://my-bucket/input/path"));
+SequenceFileInputFormat.addInputPath(job, new Path("s3n://my-bucket/other/path"));
+
+// other FileInputFormat or SequenceFileInputFormat settings... other job settings...
+```
+
+### Available Input Formats
+
+| S3 Input Format | Corresponding Hadoop Input Format |
+| --------------- | --------------------------------- |
+| `S3SequenceFileInputFormat` | `org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat` |
+| `S3TextInputFormat` | `org.apache.hadoop.mapreduce.lib.input.TextInputFormat` |
+| `S3SequenceFileInputFormatMRV1` | `org.apache.hadoop.mapred.TextInputFormat` |
+| `S3TextInputFormatMRV1` | `org.apache.hadoop.mapred.SequenceFileInputFormat` |
+
+We've included MRV1 versions of these input formats, which we use for S3-backed Hive tables.
